@@ -1,14 +1,28 @@
 import { Request, Response } from 'express';
 import { AppointmentRegisterDTO } from '../dtos/AppointmentDTO';
+import {
+  cancelStatusAppointentService,
+  getAppointentByIdService,
+  getAppointentService,
+  registerAppointentService,
+} from '../services/appointmentServices';
 
 export const getAppointmentsController = (
   req: Request,
   res: Response
 ): void => {
-  res.status(200).json({
-    message: 'Obtener el listado de todos los turnos de todos los usuarios',
-    data: [],
-  });
+  try {
+    const response = getAppointentService();
+    res.status(200).json({
+      message: 'Obtener el listado de todos los turnos de todos los usuarios',
+      data: response,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: 'Error en el servidor',
+      data: error instanceof Error ? error.message : `Error desconocido`,
+    });
+  }
 };
 
 export const getAppointmentByIdController = (
@@ -16,20 +30,36 @@ export const getAppointmentByIdController = (
   res: Response
 ): void => {
   const { id } = req.params;
-  res.status(200).json({
-    message: 'Obtener el detalle de un turno en especifico: ' + id,
-    data: {},
-  });
+  try {
+    const response = getAppointentByIdService(id);
+    res.status(200).json({
+      message: 'Obtener el detalle de un turno en especifico: ' + id,
+      data: response,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: 'Error en el servidor',
+      data: error instanceof Error ? error.message : `Error desconocido`,
+    });
+  }
 };
 
 export const registerAppointmentController = (
   req: Request<unknown, unknown, AppointmentRegisterDTO>,
   res: Response
 ): void => {
-  res.status(201).json({
-    message: 'Registrar un nuevo turno',
-    data: req.body,
-  });
+  try {
+    const response = registerAppointentService(req.body);
+    res.status(201).json({
+      message: 'Registrar un nuevo turno',
+      data: response,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: 'Error en el servidor',
+      data: error instanceof Error ? error.message : `Error desconocido`,
+    });
+  }
 };
 
 export const cancelStatusAppointmentController = (
@@ -37,8 +67,16 @@ export const cancelStatusAppointmentController = (
   res: Response
 ): void => {
   const { id } = req.params;
-  res.status(200).json({
-    message: 'Cancelar un turno en especifico: ' + id,
-    data: {},
-  });
+  try {
+    const response = cancelStatusAppointentService(id);
+    res.status(200).json({
+      message: 'Cancelar un turno en especifico: ' + id,
+      data: response,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: 'Error en el servidor',
+      data: error instanceof Error ? error.message : `Error desconocido`,
+    });
+  }
 };

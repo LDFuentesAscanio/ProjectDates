@@ -1,11 +1,24 @@
 import { Request, Response } from 'express';
-import { UserLoginDTO, UserRegisterDTO } from '../dtos/userDTO';
+import { UserLoginDTO, UserRegisterDTO } from '../dtos/UserDTO';
+import {
+  getUserByIdService,
+  getUserService,
+  registerUserService,
+} from '../services/userServices';
 
 export const getUsersController = (req: Request, res: Response): void => {
-  res.status(200).json({
-    message: 'Obtener el listado de todos los usuarios',
-    data: [],
-  });
+  try {
+    const response = getUserService();
+    res.status(200).json({
+      message: 'Obtener el listado de todos los usuarios',
+      data: response,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: 'Error en el servidor',
+      data: error instanceof Error ? error.message : `Error desconocido`,
+    });
+  }
 };
 
 export const getUserByIdController = (
@@ -13,20 +26,36 @@ export const getUserByIdController = (
   res: Response
 ): void => {
   const { id } = req.params;
-  res.status(200).json({
-    message: 'Obtener el detalle de un usuario en especifico: ' + id,
-    data: {},
-  });
+  try {
+    const response = getUserByIdService(id);
+    res.status(200).json({
+      message: 'Obtener el detalle de un usuario en especifico: ' + id,
+      data: response,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: 'Error en el servidor',
+      data: error instanceof Error ? error.message : `Error desconocido`,
+    });
+  }
 };
 
-export const registerUserController = (
+export const registerUserController = async (
   req: Request<unknown, unknown, UserRegisterDTO>,
   res: Response
-): void => {
-  res.status(200).json({
-    message: 'Registrar un nuevo usuario',
-    data: req.body,
-  });
+): Promise<void> => {
+  try {
+    const response = await registerUserService(req.body);
+    res.status(200).json({
+      message: 'Registro Exitoso',
+      data: response,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: 'Error en el servidor',
+      data: error instanceof Error ? error.message : `Error desconocido`,
+    });
+  }
 };
 
 export const loginUserController = (

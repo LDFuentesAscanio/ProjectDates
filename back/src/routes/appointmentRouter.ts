@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { AppointmentRegisterDTO } from '../dtos/AppointmentDTO';
 import {
   cancelStatusAppointmentController,
@@ -6,6 +6,7 @@ import {
   getAppointmentsController,
   registerAppointmentController,
 } from '../controllers/appointmentController';
+import { validateAppointmentRegisterData } from '../middlewares/appointmentMiddleware';
 
 const appointmentRouter: Router = Router();
 
@@ -19,6 +20,8 @@ appointmentRouter.get(`/:id`, (req: Request<{ id: string }>, res: Response) =>
 
 appointmentRouter.post(
   `/schedule`,
+  (req: Request, res: Response, next: NextFunction) =>
+    validateAppointmentRegisterData(req, res, next),
   (req: Request<unknown, unknown, AppointmentRegisterDTO>, res: Response) =>
     registerAppointmentController(req, res)
 );
