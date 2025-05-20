@@ -1,7 +1,7 @@
-import { ICredential } from '../Interfaces/CredentialInterface';
+import { CredentialModel } from '../config/data.sourse';
+import { Credential } from '../entities/Credentials.entity';
 
-const credentialList: ICredential[] = [];
-let id = 1;
+const credentialList: Credential[] = [];
 
 const crypPass = async (password: string): Promise<string> => {
   const encoder = new TextEncoder();
@@ -17,26 +17,26 @@ const crypPass = async (password: string): Promise<string> => {
 export const createCredentialService: (
   a: string,
   b: string
-) => Promise<number> = async (
+) => Promise<Credential> = async (
   username: string,
   password: string
-): Promise<number> => {
+): Promise<Credential> => {
   const passCrypt: string = await crypPass(password);
 
-  const credentialObject: ICredential = {
-    id,
+  const credentialObject = {
     username,
     password: passCrypt,
   };
-  credentialList.push(credentialObject);
-  return id++;
+
+  const newCredential = CredentialModel.create(credentialObject);
+  return await CredentialModel.save(newCredential);
 };
 
 export const checkCredentialService = async (
   username: string,
   password: string
 ): Promise<number | undefined> => {
-  const usernameFound: ICredential | undefined = credentialList.find(
+  const usernameFound: Credential | undefined = credentialList.find(
     (credential) => credential.username === username
   );
   console.log(credentialList);
