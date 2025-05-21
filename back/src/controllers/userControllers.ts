@@ -5,6 +5,7 @@ import {
   getUserService,
   registerUserService,
 } from '../services/userServices';
+import { IPostgresError } from '../Interfaces/ErrorInterface';
 
 export const getUsersController = async (
   req: Request,
@@ -54,9 +55,15 @@ export const registerUserController = async (
       data: response,
     });
   } catch (error) {
+    const postgresError = error as IPostgresError;
     res.status(400).json({
       message: 'Error en el servidor',
-      data: error instanceof Error ? error.message : `Error desconocido`,
+      data:
+        postgresError instanceof Error
+          ? postgresError.detail
+            ? postgresError.detail
+            : postgresError.message
+          : `Error desconocido`,
     });
   }
 };
