@@ -1,4 +1,4 @@
-import { CredentialModel } from '../config/data.sourse';
+import { EntityManager } from 'typeorm';
 import { Credential } from '../entities/Credentials.entity';
 
 const credentialList: Credential[] = [];
@@ -15,21 +15,21 @@ const crypPass = async (password: string): Promise<string> => {
 };
 
 export const createCredentialService: (
+  entityManager: EntityManager,
   a: string,
   b: string
 ) => Promise<Credential> = async (
+  entityManager: EntityManager,
   username: string,
   password: string
 ): Promise<Credential> => {
   const passCrypt: string = await crypPass(password);
-
-  const credentialObject = {
+  const credentials: Credential = entityManager.create(Credential, {
     username,
     password: passCrypt,
-  };
+  });
 
-  const newCredential = CredentialModel.create(credentialObject);
-  return await CredentialModel.save(newCredential);
+  return await entityManager.save(credentials);
 };
 
 export const checkCredentialService = async (

@@ -1,6 +1,5 @@
-import { UserModel } from '../config/data.sourse';
+import { AppDataSource, UserModel } from '../config/data.sourse';
 import { UserDTO, UserRegisterDTO } from '../dtos/UserDTO';
-import { Credential } from '../entities/Credentials.entity';
 import { User } from '../entities/User.entity';
 import { createCredentialService } from './credentialServices';
 
@@ -21,17 +20,20 @@ export const getUserByIdService = async (id: string): Promise<UserDTO> => {
 export const registerUserService = async (
   user: UserRegisterDTO
 ): Promise<User> => {
-  const idCredentialsUser: Credential = await createCredentialService(
-    user.username,
-    user.password
-  );
-  const userObject = {
-    name: user.name,
-    birthdate: user.birthdate,
-    email: user.email,
-    nDni: user.nDni,
-    credentials: idCredentialsUser,
-  };
-  const newUser = UserModel.create(userObject);
-  return await UserModel.save(newUser);
+  const result = await AppDataSource.transaction(async (entityManager) => {
+    const userCredentials = await createCredentialService(
+      entityManager,
+      user.username,
+      user.password
+    );
+    const newUser: User = entityManager.create(User, {
+      name: user.name,
+      birthdate: user.birthdate,
+      email: user.email,
+      nDni: user.nDni,
+      credentials: userCredentials,
+    });
+    return await entityManager.save(newUser);
+  });
+  return result;
 };
