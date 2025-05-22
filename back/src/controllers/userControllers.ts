@@ -25,19 +25,19 @@ export const getUsersController = async (
   }
 };
 
-export const getUserByIdController = (
+export const getUserByIdController = async (
   req: Request<{ id: string }>,
   res: Response
-): void => {
+): Promise<void> => {
   const { id } = req.params;
   try {
-    const response = getUserByIdService(id);
+    const response = await getUserByIdService(id);
     res.status(200).json({
       message: 'Obtener el detalle de un usuario en especifico: ' + id,
       data: response,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(404).json({
       message: 'Error en el servidor',
       data: error instanceof Error ? error.message : `Error desconocido`,
     });
@@ -49,10 +49,9 @@ export const registerUserController = async (
   res: Response
 ): Promise<void> => {
   try {
-    const response = await registerUserService(req.body);
-    res.status(200).json({
-      message: 'Registro Exitoso',
-      data: response,
+    await registerUserService(req.body);
+    res.status(201).json({
+      message: 'Usuario registrado exitosamente',
     });
   } catch (error) {
     const postgresError = error as IPostgresError;

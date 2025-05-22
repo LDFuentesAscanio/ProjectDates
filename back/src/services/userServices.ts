@@ -11,7 +11,7 @@ export const getUserService = async (): Promise<UserDTO[]> => {
 export const getUserByIdService = async (id: string): Promise<UserDTO> => {
   const userFound = await UserModel.findOne({
     where: { id: parseInt(id, 10) },
-    relations: ['credentials'],
+    relations: [],
   });
   if (!userFound) throw new Error(`El usuario con id ${id} no existe`);
   else return userFound;
