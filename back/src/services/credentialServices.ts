@@ -1,7 +1,7 @@
 import { EntityManager } from 'typeorm';
 import { Credential } from '../entities/Credentials.entity';
-
-const credentialList: Credential[] = [];
+import { CredentialModel } from '../config/data.sourse';
+import { CustomError } from '../utils/customErrors';
 
 const crypPass = async (password: string): Promise<string> => {
   const encoder = new TextEncoder();
@@ -36,13 +36,13 @@ export const checkCredentialService = async (
   username: string,
   password: string
 ): Promise<number | undefined> => {
-  const usernameFound: Credential | undefined = credentialList.find(
-    (credential) => credential.username === username
-  );
-  console.log(credentialList);
+  const usernameFound: Credential | null = await CredentialModel.findOne({
+    where: { username: username },
+  });
   const passwordCrypt: string = await crypPass(password);
-  if (!usernameFound) throw new Error(`Usuario ${username} no encontrado`);
+  if (!usernameFound)
+    throw new CustomError(400, `Usuario ${username} no encontrado`);
   if (usernameFound.password !== passwordCrypt)
-    throw new Error('Credenciales inválidas');
+    throw new CustomError(400, 'Credenciales inválidas');
   else return usernameFound.id;
 };

@@ -16,4 +16,11 @@ export interface UserDTO {
   id: number;
   name: string;
   email: string;
+  birthdate: Date;
+  nDni: number;
+}
+
+export interface UserLoginSuccessDTO {
+  login: boolean;
+  user: UserDTO;
 }
